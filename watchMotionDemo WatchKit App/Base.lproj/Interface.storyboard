@@ -1,14 +1,37 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="11134" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="14490.70" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+    <device id="watch38" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11106"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="11055"/>
+        <deployment identifier="watchOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="14490.21"/>
     </dependencies>
     <scenes>
         <!--Interface Controller-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModuleProvider="target"/>
+                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="watchMotionDemo_WatchKit_App" customModuleProvider="target">
+                    <items>
+                        <label width="110" height="54" alignment="center" text="1 m/s/s" textAlignment="center" id="ria-sA-eMp">
+                            <fontDescription key="font" type="system" pointSize="25"/>
+                        </label>
+                        <button width="1" alignment="center" verticalAlignment="center" title="Stop" id="B2j-BU-Gje">
+                            <connections>
+                                <action selector="stopButton" destination="AgC-eL-Hgc" id="7sn-LC-Wc9"/>
+                            </connections>
+                        </button>
+                        <button width="1" alignment="left" title="Start" id="pcO-4a-AHd">
+                            <connections>
+                                <action selector="startButton" destination="AgC-eL-Hgc" id="1Yh-zw-Yiy"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="accLabel" destination="ria-sA-eMp" id="f4a-cB-dfr"/>
+                    </connections>
+                </controller>
             </objects>
         </scene>
     </scenes>

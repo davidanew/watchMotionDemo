@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C857E9072268F59800789E31 /* Notes.rtf in Resources */ = {isa = PBXBuildFile; fileRef = C857E9062268F59800789E31 /* Notes.rtf */; };
+		C857E90B2269BF4100789E31 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C857E90A2269BF4100789E31 /* HealthKit.framework */; };
 		C897EBD82268D6EB00628B7E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C897EBD72268D6EB00628B7E /* AppDelegate.swift */; };
 		C897EBDA2268D6EB00628B7E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C897EBD92268D6EB00628B7E /* ViewController.swift */; };
 		C897EBDD2268D6EB00628B7E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C897EBDB2268D6EB00628B7E /* Main.storyboard */; };
@@ -64,6 +66,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C857E9062268F59800789E31 /* Notes.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Notes.rtf; sourceTree = "<group>"; };
+		C857E9082269BF4100789E31 /* watchMotionDemo WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "watchMotionDemo WatchKit Extension.entitlements"; sourceTree = "<group>"; };
+		C857E90A2269BF4100789E31 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS5.2.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
 		C897EBD42268D6EB00628B7E /* watchMotionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = watchMotionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C897EBD72268D6EB00628B7E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C897EBD92268D6EB00628B7E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -94,12 +99,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C857E90B2269BF4100789E31 /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C857E9092269BF4100789E31 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C857E90A2269BF4100789E31 /* HealthKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		C897EBCB2268D6EB00628B7E = {
 			isa = PBXGroup;
 			children = (
@@ -107,6 +121,7 @@
 				C897EBEA2268D6ED00628B7E /* watchMotionDemo WatchKit App */,
 				C897EBF92268D6EE00628B7E /* watchMotionDemo WatchKit Extension */,
 				C897EBD52268D6EB00628B7E /* Products */,
+				C857E9092269BF4100789E31 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -129,6 +144,7 @@
 				C897EBDE2268D6ED00628B7E /* Assets.xcassets */,
 				C897EBE02268D6ED00628B7E /* LaunchScreen.storyboard */,
 				C897EBE32268D6ED00628B7E /* Info.plist */,
+				C857E9062268F59800789E31 /* Notes.rtf */,
 			);
 			path = watchMotionDemo;
 			sourceTree = "<group>";
@@ -146,6 +162,7 @@
 		C897EBF92268D6EE00628B7E /* watchMotionDemo WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
+				C857E9082269BF4100789E31 /* watchMotionDemo WatchKit Extension.entitlements */,
 				C897EBFA2268D6EE00628B7E /* InterfaceController.swift */,
 				C897EBFC2268D6EE00628B7E /* ExtensionDelegate.swift */,
 				C897EBFE2268D6EF00628B7E /* Assets.xcassets */,
@@ -222,12 +239,25 @@
 				TargetAttributes = {
 					C897EBD32268D6EB00628B7E = {
 						CreatedOnToolsVersion = 10.2.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+						};
 					};
 					C897EBE52268D6ED00628B7E = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
 					C897EBF42268D6EE00628B7E = {
 						CreatedOnToolsVersion = 10.2.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes.watchos.extension = {
+								enabled = 1;
+							};
+							com.apple.HealthKit.watchos = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -256,6 +286,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C857E9072268F59800789E31 /* Notes.rtf in Resources */,
 				C897EBE22268D6ED00628B7E /* LaunchScreen.storyboard in Resources */,
 				C897EBDF2268D6ED00628B7E /* Assets.xcassets in Resources */,
 				C897EBDD2268D6EB00628B7E /* Main.storyboard in Resources */,
@@ -463,6 +494,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "watchMotionDemo WatchKit Extension/watchMotionDemo WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 64F6S6MS6N;
 				INFOPLIST_FILE = "watchMotionDemo WatchKit Extension/Info.plist";
@@ -485,6 +517,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "watchMotionDemo WatchKit Extension/watchMotionDemo WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 64F6S6MS6N;
 				INFOPLIST_FILE = "watchMotionDemo WatchKit Extension/Info.plist";
