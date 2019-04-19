@@ -4,12 +4,16 @@ import WatchKit
 import Foundation
 import CoreMotion
 import HealthKit
+import WatchConnectivity
+import os.log
 
-class InterfaceController: WKInterfaceController {
+class InterfaceController: WKInterfaceController, WCSessionDelegate {
+    
     @IBOutlet weak var accLabel: WKInterfaceLabel!
     let motionManager = CMMotionManager()
     var workoutSession : HKWorkoutSession?
     let healthStore = HKHealthStore()
+    var connectivitySession : WCSession?
     
     @IBAction func startButton() {
         if (workoutSession != nil){
@@ -23,23 +27,32 @@ class InterfaceController: WKInterfaceController {
         }
         catch {
             print("Error generating workout session")
+            return
         }
         workoutSession?.startActivity(with: Date())
         if motionManager.isDeviceMotionAvailable {
             motionManager.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
-                if let acceleration : CMAcceleration = data?.userAcceleration {
-                    let xSquared : Double = pow(acceleration.x, 2)
-                    let ySquared : Double = pow(acceleration.y, 2)
-                    let zSquared : Double = pow(acceleration.z, 2)
-                    let totalSquared : Double = xSquared + ySquared + zSquared
-                    let totalAcceleration : Double = sqrt(totalSquared)
-                    //TODO: Check units
-                    self.accLabel.setText(String(format: "%.1fm/s/s", totalAcceleration)   )
-                    print (totalAcceleration)
+                guard let acceleration : CMAcceleration = data?.userAcceleration else {
+                    os_log("Invalid acceleration")
+                    return
                 }
-                else {
-                    print ("data is nil")
+                guard let rotationRate : CMRotationRate = data?.rotationRate else {
+                    os_log("Invalid rotation rate")
+                    return
                 }
+                let totalAcceleration = sqrt(pow(acceleration.x, 2) + pow(acceleration.y, 2) + pow(acceleration.z, 2))
+                self.accLabel.setText(String(format: "%.1fg", totalAcceleration))
+                let messageDict : [String : Double] = [
+                    "AccX" : acceleration.x,
+                    "AccY" : acceleration.y,
+                    "AccZ" : acceleration.z,
+                    "RotX" : rotationRate.x,
+                    "RotY" : rotationRate.y,
+                    "RotZ" : rotationRate.z
+                ]
+                self.connectivitySession?.sendMessage(messageDict, replyHandler: nil , errorHandler: { (error) in
+                    print("message error \(error)")
+                })
             }
         }
         else {
@@ -53,14 +66,20 @@ class InterfaceController: WKInterfaceController {
         motionManager.stopDeviceMotionUpdates()
         workoutSession?.end()
         workoutSession = nil
-        self.accLabel.setText(String("Stopped")   )
+        self.accLabel.setText("Stopped")
     }
-    
     
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
-        motionManager.deviceMotionUpdateInterval = 1
-        accLabel.setText("")
+        motionManager.deviceMotionUpdateInterval = 0.1
+        self.accLabel.setText("Stopped")
+
+        if WCSession.isSupported() {
+            connectivitySession = WCSession.default
+            connectivitySession?.delegate = self
+            connectivitySession?.activate()
+            
+        }
     }
     
     override func willActivate() {
@@ -72,6 +91,9 @@ class InterfaceController: WKInterfaceController {
     override func didDeactivate() {
         // This method is called when watch view controller is no longer visible
         super.didDeactivate()
+    }
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        os_log("WC session activated on watch")
     }
 
 }
