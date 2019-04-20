@@ -1,22 +1,16 @@
-//
-//  ViewController.swift
-//  watchMotionDemo
-//
-//  Created by David New on 18/04/2019.
 //  Copyright © 2019 David New. All rights reserved.
-//
 
 import UIKit
 import WatchConnectivity
 import os.log
 
-
-
 class ViewController: UIViewController, WCSessionDelegate  {
     
+    //Sensor values are multiplied by this to produce graphs with the right range
     let accGain : Double = 1.0
     let rotGain : Double = 0.1
     
+    //Graphs for senso values use progress views
     @IBOutlet weak var progressAX: UIProgressView!
     @IBOutlet weak var progressAY: UIProgressView!
     @IBOutlet weak var progressAZ: UIProgressView!
@@ -24,36 +18,33 @@ class ViewController: UIViewController, WCSessionDelegate  {
     @IBOutlet weak var progressRY: UIProgressView!
     @IBOutlet weak var progressRZ: UIProgressView!
     
+    //Label for debugging/logging
+    @IBOutlet weak var testLabel: UILabel!
+
+    //TODO: Either remove this or figure out how it is meant to work
     struct Log {
         static var general = OSLog(subsystem: "com.watchMotionDemo", category: "general")
     }
     
+    //Session for recieving data from watch
     var connectivitySession : WCSession?
+    
+    //Reuquired WCSessionDelegate methods
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         os_log("activationDidComplete on phone")
     }
-    
     func sessionDidBecomeInactive(_ session: WCSession) {
         os_log("sessionDidBecomeInactive on phone")
 
     }
-    
     func sessionDidDeactivate(_ session: WCSession) {
         os_log("sessionDidDeactivate on phone")
-
     }
     
+    //handle message from watch
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
- /*
-        if let response = message["AccX"] as? Double {
-            os_log("phone message recieved")
-            DispatchQueue.main.async {
-                self.testLabel.text = "phone message recieved : \(response)"
-            }
-             
-        }
- */
+        //Extract values from message dictionary
         let accX : Double = message["AccX"] as? Double ?? 0.0
         let accY : Double = message["AccY"] as? Double ?? 0.0
         let accZ : Double = message["AccZ"] as? Double ?? 0.0
@@ -61,6 +52,7 @@ class ViewController: UIViewController, WCSessionDelegate  {
         let rotY : Double = message["RotY"] as? Double ?? 0.0
         let rotZ : Double = message["RotZ"] as? Double ?? 0.0
         DispatchQueue.main.async {
+            //Update graphs
             self.testLabel.text = (String(accX))
             self.progressAX.progress = Float(accX * self.accGain)
             self.progressAY.progress = Float(accY * self.accGain)
@@ -72,15 +64,11 @@ class ViewController: UIViewController, WCSessionDelegate  {
 
     }
 
-    @IBOutlet weak var testLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        //testLabel.text = "phone view did load"
-        //print("phone view did load")
-        //os_log("watchMotionDemo phone view did load", log: Log.general, type: .info)
         os_log("viewDidLoad")
-        
-        // Do any additional setup after loading the view.
+        //Start watch connection to listen for messages
         if WCSession.isSupported() {
             connectivitySession = WCSession.default
             connectivitySession?.delegate = self
