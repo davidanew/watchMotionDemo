@@ -18,7 +18,21 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     let healthStore = HKHealthStore()
     //For sending messages to the phone
     var connectivitySession : WCSession?
-    
+    //Period ogf motion samples
+    let deviceMotionUpdateInterval : TimeInterval = 0.02
+    //We take a max of samples over deviceMotionUpdateInterval and send it after
+    //this many samples
+    let samplesPerMessage : Int = 25
+    //Used to cound to the above amount of samples
+    var sampleCount : Int = 0
+    //Store working copies of the max amopunt of samples
+    var accXMax : Double = 0
+    var accYMax : Double = 0
+    var accZMax : Double = 0
+    var rotXMax : Double = 0
+    var rotYMax : Double = 0
+    var rotZMax : Double = 0
+  
     //Start button has been pressed
     //TODO: Update colours on buttons on start and stop
     @IBAction func startButton() {
@@ -43,7 +57,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         if motionManager.isDeviceMotionAvailable {
             //TODO: Update this for max counting
             //request updates from motion manager
-            motionManager.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
+            motionManager.startDeviceMotionUpdates(to: OperationQueue.current!) { [weak self] (data, error) in
                 //Need valid data for acceleration and rortation
                 guard let acceleration : CMAcceleration = data?.userAcceleration else {
                     os_log("Invalid acceleration")
@@ -53,22 +67,42 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                     os_log("Invalid rotation rate")
                     return
                 }
-                //Display total acceleration on watch
-                let totalAcceleration = sqrt(pow(acceleration.x, 2) + pow(acceleration.y, 2) + pow(acceleration.z, 2))
-                self.accLabel.setText(String(format: "%.1fg", totalAcceleration))
-                //Create a dictionary of the acceleration and rotation data
-                let messageDict : [String : Double] = [
-                    "AccX" : acceleration.x,
-                    "AccY" : acceleration.y,
-                    "AccZ" : acceleration.z,
-                    "RotX" : rotationRate.x,
-                    "RotY" : rotationRate.y,
-                    "RotZ" : rotationRate.z
-                ]
-                //Send this dictionary to the watch
-                self.connectivitySession?.sendMessage(messageDict, replyHandler: nil , errorHandler: { (error) in
-                    print("message error \(error)")
-                })
+                //Update the max values
+                self?.accXMax = max(acceleration.x, self?.accXMax ?? 0.0)
+                self?.accYMax = max(acceleration.y, self?.accYMax ?? 0.0)
+                self?.accZMax = max(acceleration.z, self?.accZMax ?? 0.0)
+                self?.rotXMax = max(rotationRate.x, self?.rotXMax ?? 0.0)
+                self?.rotYMax = max(rotationRate.y, self?.rotYMax ?? 0.0)
+                self?.rotZMax = max(rotationRate.z, self?.rotZMax ?? 0.0)
+                
+                if let samplesPerMessage = self?.samplesPerMessage,  self?.sampleCount == samplesPerMessage - 1 {
+                    //Display total acceleration on watch
+                    let totalAcceleration = sqrt(pow(acceleration.x, 2) + pow(acceleration.y, 2) + pow(acceleration.z, 2))
+                    self?.accLabel.setText(String(format: "%.1fg", totalAcceleration))
+                    //Create a dictionary of the acceleration and rotation data
+                    let messageDict : [String : Double] = [
+                        "AccX" : self?.accXMax ?? 0.0,
+                        "AccY" : self?.accYMax ?? 0.0,
+                        "AccZ" : self?.accZMax ?? 0.0,
+                        "RotX" : self?.rotXMax ?? 0.0,
+                        "RotY" : self?.rotYMax ?? 0.0,
+                        "RotZ" : self?.rotZMax ?? 0.0
+                    ]
+                    //Send this dictionary to the watch
+                    self?.connectivitySession?.sendMessage(messageDict, replyHandler: nil , errorHandler: { (error) in
+                        print("message error \(error)")
+                    })
+                    self?.sampleCount = 0
+                    self?.accXMax = 0.0
+                    self?.accYMax = 0.0
+                    self?.accZMax = 0.0
+                    self?.rotXMax = 0.0
+                    self?.rotYMax = 0.0
+                    self?.rotZMax = 0.0
+                }
+                else {
+                    self?.sampleCount += 1
+                }
             }
         }
         else {
@@ -93,7 +127,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         //Sensor data update frequency
-        motionManager.deviceMotionUpdateInterval = 0.1
+        motionManager.deviceMotionUpdateInterval = deviceMotionUpdateInterval
         //Show user the workout is not yet running
         self.accLabel.setText("Stopped")
         //Start phone connection session
@@ -101,7 +135,6 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             connectivitySession = WCSession.default
             connectivitySession?.delegate = self
             connectivitySession?.activate()
-            
         }
     }
     

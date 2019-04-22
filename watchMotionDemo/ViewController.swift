@@ -52,14 +52,15 @@ class ViewController: UIViewController, WCSessionDelegate  {
         let rotY : Double = message["RotY"] as? Double ?? 0.0
         let rotZ : Double = message["RotZ"] as? Double ?? 0.0
         DispatchQueue.main.async {
+            //test label for any test
+            self.testLabel.text = (String(rotX))
             //Update graphs
-            self.testLabel.text = (String(accX))
-            self.progressAX.progress = Float(accX * self.accGain)
-            self.progressAY.progress = Float(accY * self.accGain)
-            self.progressAZ.progress = Float(accZ * self.accGain)
-            self.progressRX.progress = Float(rotX * self.rotGain)
-            self.progressRY.progress = Float(rotY * self.rotGain)
-            self.progressRZ.progress = Float(rotZ * self.rotGain)
+            self.progressAX.progress = Float(abs(accX * self.accGain))
+            self.progressAY.progress = Float(abs(accY * self.accGain))
+            self.progressAZ.progress = Float(abs(accZ * self.accGain))
+            self.progressRX.progress = Float(abs(rotX * self.rotGain))
+            self.progressRY.progress = Float(abs(rotY * self.rotGain))
+            self.progressRZ.progress = Float(abs(rotZ * self.rotGain))
         }
 
     }
